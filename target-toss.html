@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Target Toss | GambliX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: #000;
+      color: white;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      font-size: 2em;
+      color: #00ffee;
+      margin-bottom: 10px;
+    }
+
+    .wallet {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+    }
+
+    #wheel {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      margin: 20px auto;
+      border: 5px solid white;
+      position: relative;
+      animation: spin 2s ease-out;
+    }
+
+    .target {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: center center;
+      transform: translate(-50%, -50%);
+    }
+
+    .gold { background: gold; transform: translate(-50%, -50%) rotate(0deg); }
+    .green { background: limegreen; transform: translate(-50%, -50%) rotate(90deg); }
+    .blue { background: dodgerblue; transform: translate(-50%, -50%) rotate(180deg); }
+    .red { background: crimson; transform: translate(-50%, -50%) rotate(270deg); }
+
+    button {
+      font-size: 1em;
+      padding: 10px 25px;
+      margin: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #00ffaa;
+      color: black;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #66ffe6;
+    }
+
+    #result {
+      font-size: 1.4em;
+      margin-top: 20px;
+      min-height: 2em;
+    }
+
+    #cheat {
+      margin-top: 15px;
+      display: inline-block;
+      font-size: 0.9em;
+      color: #999;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 Target Toss</h1>
+  <div class="wallet">Wallet: <span id="wallet">0</span> tokens</div>
+
+  <div id="wheel">
+    <div class="target gold"></div>
+    <div class="target green"></div>
+    <div class="target blue"></div>
+    <div class="target red"></div>
+  </div>
+
+  <button onclick="toss()">TOSS 🎯 (-250)</button>
+  <div id="result"></div>
+
+  <div id="cheat">
+    <input type="checkbox" id="cheatToggle"> Enable Cheat Mode
+  </div>
+
+  <script>
+    let wallet = parseInt(localStorage.getItem("tokens") || "1000");
+    const walletEl = document.getElementById("wallet");
+    const resultEl = document.getElementById("result");
+
+    function updateWallet() {
+      localStorage.setItem("tokens", wallet);
+      walletEl.textContent = wallet;
+    }
+
+    function toss() {
+      if (wallet < 250) {
+        resultEl.textContent = "❌ Not enough tokens!";
+        return;
+      }
+
+      wallet -= 250;
+
+      const cheat = document.getElementById("cheatToggle").checked;
+      const roll = Math.random();
+
+      let zone = "";
+      let reward = 0;
+
+      if (cheat) {
+        if (roll < 0.4) {
+          zone = "🎉 JACKPOT!";
+          reward = 5000;
+        } else if (roll < 0.8) {
+          zone = "💰 Nice Hit!";
+          reward = 1000;
+        } else if (roll < 0.95) {
+          zone = "⚖️ Small Gain";
+          reward = 250;
+        } else {
+          zone = "💀 You Missed!";
+          reward = -250;
+        }
+      } else {
+        if (roll < 0.05) {
+          zone = "🎉 JACKPOT!";
+          reward = 5000;
+        } else if (roll < 0.30) {
+          zone = "💰 Nice Hit!";
+          reward = 1000;
+        } else if (roll < 0.50) {
+          zone = "⚖️ Small Gain";
+          reward = 250;
+        } else {
+          zone = "💀 You Missed!";
+          reward = -250;
+        }
+      }
+
+      wallet += reward;
+      updateWallet();
+
+      // Visual feedback
+      document.getElementById("wheel").style.animation = "spin 1s ease-out";
+      resultEl.textContent = zone + ` (${reward >= 0 ? "+" : ""}${reward} tokens)`;
+    }
+
+    updateWallet();
+  </script>
+</body>
+</html>

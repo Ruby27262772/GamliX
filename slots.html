@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slots - GambliX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(to right, #111, #222);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+    }
+
+    .wallet {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      color: #ffea00;
+    }
+
+    .slots-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 40px 0;
+    }
+
+    .reel {
+      width: 80px;
+      height: 80px;
+      background: #000;
+      border: 2px solid #00ffff;
+      font-size: 2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: spin 0.5s ease-in-out;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #00ffff;
+    }
+
+    @keyframes spin {
+      0%   { transform: rotateX(0); }
+      50%  { transform: rotateX(180deg); }
+      100% { transform: rotateX(360deg); }
+    }
+
+    button {
+      background: #00cc99;
+      color: black;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00cc99;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.5em;
+    }
+
+    a {
+      color: #00ffff;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎰 GambliX Slots</h1>
+  <div class="wallet">💰 Wallet: <span id="tokens">0</span> Tokens</div>
+
+  <div class="slots-container">
+    <div class="reel" id="reel1">❓</div>
+    <div class="reel" id="reel2">❓</div>
+    <div class="reel" id="reel3">❓</div>
+  </div>
+
+  <button onclick="spin()">Spin (Cost: 10)</button>
+  <div id="result"></div>
+
+  <a href="index.html">⬅️ Back to Menu</a>
+
+  <script>
+    const symbols = ['🍒', '🔔', '🍋', '⭐', '💎', '7️⃣'];
+    let tokens = parseInt(localStorage.getItem("tokens")) || 100;
+
+    function updateWallet() {
+      document.getElementById("tokens").textContent = tokens;
+      localStorage.setItem("tokens", tokens);
+    }
+
+    function spin() {
+      if (tokens < 10) {
+        document.getElementById("result").textContent = "❌ Not enough tokens!";
+        return;
+      }
+
+      tokens -= 10;
+
+      // Randomly choose symbols
+      let r1 = symbols[Math.floor(Math.random() * symbols.length)];
+      let r2 = symbols[Math.floor(Math.random() * symbols.length)];
+      let r3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+      // Show animation
+      let reels = [document.getElementById("reel1"), document.getElementById("reel2"), document.getElementById("reel3")];
+      [r1, r2, r3].forEach((sym, i) => {
+        reels[i].style.animation = "none";
+        void reels[i].offsetWidth; // restart animation
+        reels[i].style.animation = null;
+        reels[i].textContent = sym;
+      });
+
+      // Win condition: all match
+      if (r1 === r2 && r2 === r3) {
+        tokens += 50;
+        document.getElementById("result").textContent = `🎉 Jackpot! +50 tokens (${r1}${r2}${r3})`;
+      } else if (r1 === r2 || r2 === r3 || r1 === r3) {
+        tokens += 10;
+        document.getElementById("result").textContent = `⭐ Small Win! +10 tokens`;
+      } else {
+        document.getElementById("result").textContent = `😢 Try again!`;
+      }
+
+      updateWallet();
+    }
+
+    updateWallet();
+  </script>
+</body>
+</html>
